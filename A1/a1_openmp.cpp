@@ -31,6 +31,18 @@ vector<vector<double>> generate_identity_matrix(int n){
     return matrix;
 }
 
+double norm(vector<vector<double>> matrix){
+    int n = matrix.size() ;
+    double normVal = 0.0 ;
+    for(int i = 0; i < n ; i +=1){
+        for(int j = 0; j < n ; j +=1){
+            normVal += matrix[i][j] * matrix[i][j] ;
+        }        
+    }
+    normVal = sqrt(normVal) ;
+    return normVal;
+}
+
 vector<vector<double>> generate_random_matrix(int n){
     vector<vector<double>> matrix;
     
