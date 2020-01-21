@@ -1,2 +1,2 @@
-g++ a1.c++
-a.out N inputfile
+g++ test.cpp
+./a.out 7 4
