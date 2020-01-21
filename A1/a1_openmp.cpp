@@ -44,25 +44,38 @@ vector<vector<double>> generate_random_matrix(int n){
     return matrix;
 }
 
-// vector<vector<double>> matrix_multiplication(vector<vector<double>> a, vector<vector<double>> b){
-//     int r1 = a.size();
-//     int c1 = a.at(0).size();
-//     int c2 = b.at(0).size();
+vector<vector<double>> generate_matrix_p(vector<int> matrix_pi){
+    vector<vector<double>> matrix;
+
+    for(int i=0; i<n; i++){
+        matrix.push_back(vector<double>(n,0));
+    }
+    for(int i=0; i<n; i++){
+        matrix.at(i).at(matrix_pi.at(i)) = 1;
+    }
+
+    return matrix;
+}
+
+vector<vector<double>> matrix_multiplication(vector<vector<double>> a, vector<vector<double>> b){
+    int r1 = a.size();
+    int c1 = a.at(0).size();
+    int c2 = b.at(0).size();
     
-//     vector<vector<double>> mult;
-//     for(int i=0; i<r1; i++){
-//         mult.push_back(vector<double>(c2,0));
-//     }
+    vector<vector<double>> mult;
+    for(int i=0; i<r1; i++){
+        mult.push_back(vector<double>(c2,0));
+    }
     
-//     for(int i = 0; i < r1; ++i){
-//         for(int j = 0; j < c2; ++j){
-//             for(int k = 0; k < c1; ++k){
-//                 mult.at(i).at(j) += a.at(i).at(k) * b.at(k).at(j);
-//             }
-//         }
-//     }
-//     return mult; 
-// }
+    for(int i = 0; i < r1; ++i){
+        for(int j = 0; j < c2; ++j){
+            for(int k = 0; k < c1; ++k){
+                mult.at(i).at(j) += a.at(i).at(k) * b.at(k).at(j);
+            }
+        }
+    }
+    return mult; 
+}
 
 int main(int argc, char *argv[])
 {    
@@ -110,8 +123,11 @@ int main(int argc, char *argv[])
     printf("\n Pi: \n");
     for(int i=0; i<n; i++){ printf("%d ", pi.at(i)); }
     printf("\n");
-    // printf("\n L*U: \n");
-    // print_matrix(matrix_multiplication(l,u));
+
+    printf("\n P*A: \n");
+    print_matrix(matrix_multiplication(generate_matrix_p(pi),a));
+    printf("\n L*U: \n");
+    print_matrix(matrix_multiplication(l,u));
     
 
 
