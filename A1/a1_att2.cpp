@@ -152,24 +152,24 @@ int main(int argc, char *argv[]){
             }
         }
     }
-    cout << "A" << endl;
-    print_matrix(aSave);
-    for(int i = 0 ; i < n ; i +=1){
-        cout << pi.at(i) << " " ;
-    }
-    cout << endl;
-    cout << "U" <<endl;
-    print_matrix(u);
-    cout << "L" <<endl;
-    print_matrix(l);
-    vector<vector<double>> lu = matrix_multiplication(l,u);
-    cout << "LU" << endl ;
-    print_matrix(lu); 
+    // cout << "A" << endl;
+    // print_matrix(aSave);
+    // for(int i = 0 ; i < n ; i +=1){
+    //     cout << pi.at(i) << " " ;
+    // }
+    // cout << endl;
+    // cout << "U" <<endl;
+    // print_matrix(u);
+    // cout << "L" <<endl;
+    // print_matrix(l);
+    // vector<vector<double>> lu = matrix_multiplication(l,u);
+    // cout << "LU" << endl ;
+    // print_matrix(lu); 
     vector<vector<double>> p = generateP(pi);
-    cout <<"PA"<<endl;
+    // cout <<"PA"<<endl;
     // vector<vector<double>> pa = ;
-    print_matrix(matrix_multiplication(p,aSave));
+    // print_matrix(matrix_multiplication(p,aSave));
 // 
     // vector<vector<double>> diff = ;
-    cout << norm(difference(lu,matrix_multiplication(p,aSave))) << endl;
+    // cout << norm(difference(lu,matrix_multiplication(p,aSave))) << endl;
 }
