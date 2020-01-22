@@ -50,7 +50,7 @@ vector<vector<double>> generate_random_matrix(int n){
     for(int i=0; i<n; i++){
         matrix.push_back( vector<double>());
         for(int j=0; j<n; j++){
-            matrix.at(i).push_back(rand());
+            matrix.at(i).push_back(rand()/10000000);
         }
     }
     return matrix;
@@ -100,19 +100,21 @@ int main(int argc, char *argv[])
     
     for(int i=0; i<n; i++){ pi.at(i) = i; }
     for(int k=0; k<n; k++){
-        int max=0;
-        int k_dash; // Check where to initialise
+        double max=0;
+        int k_dash; // Stores which row contains max value for that column
         for(int i=k; i<n; i++){
             if( max < abs( a.at(i).at(k) ) ){
                 max = abs( a.at(i).at(k) );
                 k_dash = i;
             }
         }
-        try{ if( max == 0 ){ throw "Error: Singular Matrix";} }
-        catch(string e){ printf("%s\n", e.c_str()); }
+        if( max == 0 ){ 
+            printf("Error: Singular Matrix");
+            exit(0);
+        }
         swap(pi.at(k), pi.at(k_dash));
         swap(a.at(k), a.at(k_dash));
-        for(int i=1; i<=k-1; i++){ swap(l.at(k).at(i), l.at(k_dash).at(i)); }
+        for(int i=0; i<k; i++){ swap(l.at(k).at(i), l.at(k_dash).at(i)); }
         u.at(k).at(k) = a.at(k).at(k);
         for(int i=k+1; i<n; i++){
             l.at(i).at(k) = a.at(i).at(k)/u.at(k).at(k);
@@ -123,7 +125,6 @@ int main(int argc, char *argv[])
                 a.at(i).at(j) = a.at(i).at(j) - l.at(i).at(k)*u.at(k).at(j);
             }
         }
-
     }
 
     printf("A: \n");
@@ -141,7 +142,6 @@ int main(int argc, char *argv[])
     printf("\n L*U: \n");
     print_matrix(matrix_multiplication(l,u));
     
-
 
     return(0);
 }
