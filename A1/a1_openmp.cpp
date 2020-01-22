@@ -62,7 +62,31 @@ vector<vector<double>> generate_matrix_p(vector<int> matrix_pi){
     for(int i=0; i<n; i++){
         matrix.push_back(vector<double>(n,0));
     }
-    for(int i=0; i<n; i++){
+    for(int i=0; i<n; i++vector<vector<double>> read_matrix(string matrix_filename){
+    // FILE *fin = fopen(matrix_filename, "r");
+
+    // *matrix = (double*) malloc( sizeof(double) * (*N) * (*N));
+
+    // for(int i=0; i< (*N)*(*N); i++){
+    //         fscanf(fin, "%d", (*matrix + i));
+    //     }
+    // }
+    // fclose(fin)
+    ifstream infile(matrix_filename);
+    vector<vector<double>> matrix ;
+    int n ;
+    infile >> n ;
+    double d ;
+    for(int i = 0 ; i < n ; i +=1){
+        matrix.push_back( vector<double>() ) ; 
+        for(int j = 0 ; j < n ; j +=1){
+            infile >> d ; 
+            matrix.at(i).push_back(d) ;
+        }
+    }
+    return matrix;
+}
+){
         matrix.at(i).at(matrix_pi.at(i)) = 1;
     }
 
@@ -94,13 +118,20 @@ int main(int argc, char *argv[])
     n = stoi(argv[1]);
     t = stoi(argv[2]);
     vector<vector<double>> a = generate_random_matrix(n);
+    vector<vector<double>> aSave = a;
     vector<int> pi(n,0);
-    vector<vector<double>> u = generate_identity_matrix(n);
-    vector<vector<double>> l = generate_identity_matrix(n);
-    
+    // vector<vector<double>> u = generate_identity_matrix(n);
+    // vector<vector<double>> l = generate_identity_matrix(n);
+    vector<vector<double>> u(n,vector<double>(n));
+    // cout<<upper[0][1] <<endl;
+    vector<vector<double>> l(n,vector<double>(n));
+    for(int i =0 ; i < n ; i +=1){
+        l[i][i] = 1.00;
+    }
+
     for(int i=0; i<n; i++){ pi.at(i) = i; }
     for(int k=0; k<n; k++){
-        int max=0;
+        double max=0;
         int k_dash; // Check where to initialise
         for(int i=k; i<n; i++){
             if( max < abs( a.at(i).at(k) ) ){
@@ -108,11 +139,30 @@ int main(int argc, char *argv[])
                 k_dash = i;
             }
         }
-        try{ if( max == 0 ){ throw "Error: Singular Matrix";} }
-        catch(string e){ printf("%s\n", e.c_str()); }
-        swap(pi.at(k), pi.at(k_dash));
-        swap(a.at(k), a.at(k_dash));
-        for(int i=1; i<=k-1; i++){ swap(l.at(k).at(i), l.at(k_dash).at(i)); }
+        // try{ if( max == 0 ){ throw "Error: Singular Matrix";} }
+        // catch(string e){ printf("%s\n", e.c_str()); }
+        if(max == 0){
+            cout << "error singular matrix" <<endl;
+            exit(0);
+        }
+        
+        // swap(pi.at(k), pi.at(k_dash));
+        double tempDouble;
+        int tempInt;
+        tempInt = pi.at(k);
+        pi.at(k) = pi.at(k_dash);
+        // swap(a.at(k), a.at(k_dash));
+        for(int co = 0; co < n ; co +=1){
+            tempDouble = a.at(k).at(co) ;
+            a.at(k).at(co) = a.at(k_dash).at(co) ;
+            a.at(k_dash).at(co) = tempDouble;
+        }
+        for(int co=0; co<k-1; co++){
+            //  swap(l.at(k).at(i), l.at(k_dash).at(i));
+            tempDouble = l.at(k).at(co) ;
+            l.at(k).at(co) = l.at(k_dash).at(co);
+            l.at(k_dash).at(co) =  tempDouble;
+        }
         u.at(k).at(k) = a.at(k).at(k);
         for(int i=k+1; i<n; i++){
             l.at(i).at(k) = a.at(i).at(k)/u.at(k).at(k);
@@ -137,7 +187,9 @@ int main(int argc, char *argv[])
     printf("\n");
 
     printf("\n P*A: \n");
-    print_matrix(matrix_multiplication(generate_matrix_p(pi),a));
+    print_matrix(matrix_multiplication(generate_matrix_p(pi),aSave));
+    // printf("\n A: \n");    
+    // print_matrix(aSave);
     printf("\n L*U: \n");
     print_matrix(matrix_multiplication(l,u));
     
