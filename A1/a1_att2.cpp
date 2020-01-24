@@ -96,11 +96,26 @@ double norm(vector<vector<double>> matrix){
     return normVal;
 }
 
+vector<vector<double>> generate_random_matrix(int n){
+    vector<vector<double>> matrix;
+    
+    srand(1); // Send the same seed if you want to parallelize this part
+    for(int i=0; i<n; i++){
+        matrix.push_back( vector<double>());
+        for(int j=0; j<n; j++){
+            matrix.at(i).push_back(rand()%100);
+        }
+    }
+    return matrix;
+}
+
 int main(int argc, char *argv[]){
-    std::string matrix_filename(argv[1]);
-    vector<vector<double>> a = read_matrix(matrix_filename) ;
-    vector<vector<double>> aSave = a;
-    int n = a.size( ) ;
+    // std::string matrix_filename(argv[1]);
+    // vector<vector<double>> a = read_matrix(matrix_filename) ;
+    // vector<vector<double>> aSave = a;
+    int n = 4;
+    vector<vector<double>> a = generate_random_matrix(n);    
+    // int n = a.size( ) ;
     // print_matrix(a);
     vector<int> pi;
     for(int i = 0 ; i < n ; i +=1){
@@ -114,6 +129,10 @@ int main(int argc, char *argv[]){
     }
     // print_matrix(l) ;
     for(int k = 0 ; k < n ; k +=1){
+        // cout << "********" << endl;
+        // print_matrix(a);
+        // print_matrix(l);
+        // print_matrix(u);
         double max = 0.0;
         int kPrime ;
         for(int i = k ; i < n ; i +=1){
@@ -146,9 +165,14 @@ int main(int argc, char *argv[]){
             l.at(i).at(k) = a.at(i).at(k) / u.at(k).at(k);
             u.at(k).at(i) = a.at(k).at(i);
         }
+
         for(int i = k+1 ; i < n ; i+=1){
             for(int j = k+1 ; j < n ; j+=1){
+                cout << "-------------" << endl;
+                cout << k << " " << i << " " <<j <<endl; 
+                cout << "here "<< a.at(i).at(j) << " " << l.at(i).at(k) << " " << u.at(k).at(j) << endl;
                 a.at(i).at(j) = a.at(i).at(j) - l.at(i).at(k)*u.at(k).at(j); 
+                cout << "here "<< a.at(i).at(j) << endl;
             }
         }
     }
@@ -162,14 +186,16 @@ int main(int argc, char *argv[]){
     // print_matrix(u);
     // cout << "L" <<endl;
     // print_matrix(l);
-    // vector<vector<double>> lu = matrix_multiplication(l,u);
+    vector<vector<double>> lu = matrix_multiplication(l,u);
     // cout << "LU" << endl ;
-    // print_matrix(lu); 
-    vector<vector<double>> p = generateP(pi);
+    print_matrix(lu);
+    print_matrix(l);
+    print_matrix(u); 
+    // vector<vector<double>> p = generateP(pi);
+    
     // cout <<"PA"<<endl;
     // vector<vector<double>> pa = ;
     // print_matrix(matrix_multiplication(p,aSave));
-// 
     // vector<vector<double>> diff = ;
     // cout << norm(difference(lu,matrix_multiplication(p,aSave))) << endl;
 }
