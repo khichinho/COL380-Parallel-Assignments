@@ -1,5 +1,9 @@
-rm mat.txt
-g++ generateMat.cpp
-./a.out 4 > mat.txt
-g++ a1_att2.cpp
-./a.out mat.txt 
+rm a.out
+g++ a1_sequential.cpp
+time ./a.out 1500
+rm a.out 
+g++ -pthread a1_pthreads.cpp
+time ./a.out 1500 4
+rm a.out
+g++ -fopenmp a1_openmp.cpp
+time ./a.out 1500 4
