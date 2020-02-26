@@ -46,7 +46,7 @@ void* parallelfn(void* argc){
     struct thread_args *t_args = (struct thread_args*) argc;
     
     for(int i = t_args->startPos+1 ; i < t_args->endPos ; i+=1){
-        for(int j = t_args->startPos+1 ; j < n ; j+=1){
+        for(int j = t_args->k ; j < n ; j+=1){
             t_args->a[i][j] = t_args->a[i][j] - t_args->l[i][t_args->k]*t_args->u[t_args->k][j];
         }
     }
