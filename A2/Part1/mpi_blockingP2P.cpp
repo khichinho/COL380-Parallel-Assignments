@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define N 100
+#define N 5000
 float A[N][32], B[32][N], C[N][N], C_Serial[N][N];
 
 void initializeMatrices(){
@@ -58,11 +58,13 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Comm_size(MPI_COMM_WORLD, &numThreads);
     
-    auto start_parallel = chrono::steady_clock::now();
 
     /*---------------------------- master ----------------------------*/
     if (myRank == 0) {
         initializeMatrices();
+        
+        auto start_parallel = chrono::steady_clock::now();
+        
         rowsPerThread = (N/numThreads);
         rowsForLastThread = rowsPerThread + (N%numThreads);
         from = rowsPerThread;

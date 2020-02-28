@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define N 10000
+#define N 5000
 
 float A[N][32], B[32][N], C[N][N];
 
@@ -35,14 +35,15 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Comm_size(MPI_COMM_WORLD, &numProcessors);
     // cout << numProcessors << endl;
-    from  = myRank * (N/numProcessors);
-    to = (myRank+1)*(N/numProcessors);
 
     if(myRank == 0){
         initializeMatrices();
     }
 
     auto start_parallel = chrono::steady_clock::now();
+
+    from  = myRank * (N/numProcessors);
+    to = (myRank+1)*(N/numProcessors);
 
     MPI_Bcast(B,N*32,MPI_FLOAT,0,MPI_COMM_WORLD);
     MPI_Scatter(A,(N*32/numProcessors),MPI_FLOAT,A[from],(N*32/numProcessors),MPI_FLOAT,0,MPI_COMM_WORLD);

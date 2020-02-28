@@ -60,11 +60,13 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Comm_size(MPI_COMM_WORLD, &numThreads);
     
-    auto start_parallel = chrono::steady_clock::now();
 
     /*---------------------------- master ----------------------------*/
     if (myRank == 0) {
         initializeMatrices();
+        
+        auto start_parallel = chrono::steady_clock::now();
+        
         rowsPerThread = (N/numThreads);
         rowsForLastThread = rowsPerThread + (N%numThreads);
         from = rowsPerThread;
