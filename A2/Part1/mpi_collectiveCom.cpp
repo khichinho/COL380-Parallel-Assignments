@@ -1,10 +1,11 @@
 #include "mpi.h"
 #include <iostream>
+#include <random>
+#include <chrono>
+
 using namespace std;
-// #include <random>
 
-
-#define N 100
+#define N 10000
 
 float A[N][32], B[32][N], C[N][N];
 
@@ -40,6 +41,9 @@ int main(int argc, char *argv[]){
     if(myRank == 0){
         initializeMatrices();
     }
+
+    auto start_parallel = chrono::steady_clock::now();
+
     MPI_Bcast(B,N*32,MPI_FLOAT,0,MPI_COMM_WORLD);
     MPI_Scatter(A,(N*32/numProcessors),MPI_FLOAT,A[from],(N*32/numProcessors),MPI_FLOAT,0,MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
@@ -64,7 +68,7 @@ int main(int argc, char *argv[]){
     //     for(int i = 0; i < N; i +=1){
     //         for(int j = 0 ; j < N ; j +=1){
     //             // cout << C[i][j] << " ";
-    //             // if(C[i][j] != C2[i][j]){
+    //             // if(C[i][j] != C_serial[i][j]){
     //             cout << C[i][j] <<" ";
     //             // }
     //         }
@@ -72,30 +76,45 @@ int main(int argc, char *argv[]){
     //         cout << endl;
     //     }
     // }
+
+    auto end_parallel = chrono::steady_clock::now();
+    auto diff_parallel = end_parallel - start_parallel;
+    cout << "Parallel Program Runtime: " << chrono::duration <double, milli> (diff_parallel).count() << " ms" << endl;
+
+
     if(myRank == 0){
-        float C2[N][N];
+        float C_serial[N][N];
+        
+        auto start_serial = chrono::steady_clock::now();
+        
         for(int i = 0; i < N; i +=1){
             for(int j = 0 ; j < N ; j +=1){
-                C2[i][j] = 0.f;
+                C_serial[i][j] = 0.f;
                 for(int k = 0; k < 32; k +=1){
                     // cout <<"sone" << i << " " << j  <<endl;
-                    C2[i][j] += A[i][k] + B[k][j];
+                    C_serial[i][j] += A[i][k] + B[k][j];
                 }
             }
         }
+
+        auto end_serial = chrono::steady_clock::now();
+        auto diff_serial = end_serial - start_serial;
+        cout << "Serial Program Runtime: " << chrono::duration <double, milli> (diff_serial).count() << " ms" << endl;
+
         bool flag = true;
         for(int i = 0; i < N; i +=1){
             for(int j = 0 ; j < N ; j +=1){
                 // cout << C[i][j] << " ";
-                if(C[i][j] != C2[i][j]){
+                if(C[i][j] != C_serial[i][j]){
                     flag = false;
                     break;
-                    // cout << i << " " << j <<"  "<< C[i][j]  << " " <<  C2[i][j] <<endl;
+                    // cout << i << " " << j <<"  "<< C[i][j]  << " " <<  C_serial[i][j] <<endl;
                 }
             }
             // cout << endl;
         }
-        cout << "result = " << flag << endl;
+        if(flag==true){ cout << "Serial And Parallel Computations are EQUAL " << endl; } 
+        else if(flag==false){ cout << "Serial And Parallel Computations are NOT EQUAL " << endl; }         
             
     }
     MPI_Finalize();

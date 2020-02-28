@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Comm_size(MPI_COMM_WORLD, &numThreads);
     
-    auto start = chrono::steady_clock::now();
+    auto start_parallel = chrono::steady_clock::now();
 
     /*---------------------------- master ----------------------------*/
     if (myRank == 0) {
@@ -100,9 +100,9 @@ int main(int argc, char *argv[]){
         }
 
 
-        auto end = chrono::steady_clock::now();
-        auto diff = end - start;
-        cout << "Parallel Program Runtime: " << chrono::duration <double, milli> (diff).count() << " ms" << endl;
+        auto end_parallel = chrono::steady_clock::now();
+        auto diff_parallel = end_parallel - start_parallel;
+        cout << "Parallel Program Runtime: " << chrono::duration <double, milli> (diff_parallel).count() << " ms" << endl;
         
         /* Print matrix A */
         // cout << "A:" << endl; 
@@ -129,6 +129,8 @@ int main(int argc, char *argv[]){
         //     cout << endl;
         // }
         
+        auto start_serial = chrono::steady_clock::now();
+
         for (int i = 0; i < N; i++){
             for (int j = 0; j < N; j++){
                 C_Serial[i][j] = 0.f;
@@ -137,6 +139,10 @@ int main(int argc, char *argv[]){
                 }
             }
         }
+
+        auto end_serial = chrono::steady_clock::now();
+        auto diff_serial = end_serial - start_serial;
+        cout << "Serial Program Runtime: " << chrono::duration <double, milli> (diff_serial).count() << " ms" << endl;
 
         /* Print matrix C_Serial */
         // cout << endl << "C_Serial:" << endl;
