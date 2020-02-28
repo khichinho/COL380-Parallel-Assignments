@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define N 100
+#define N 10000
 float A[N][32], B[32][N], C[N][N], C_Serial[N][N];
 
 void initializeMatrices(){
@@ -53,13 +53,14 @@ int IsEqual(float **A, float **B, int m, int n)
 int main(int argc, char *argv[]){
     int myRank, numThreads, rowsPerThread, rowsForLastThread, from, runtime;
 
-    MPI_Request request1, request2, request3, request4, request5;
     MPI_Status status;
+    MPI_Request request;
+
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Comm_size(MPI_COMM_WORLD, &numThreads);
     
-    auto start = chrono::steady_clock::now();
+    auto start_parallel = chrono::steady_clock::now();
 
     /*---------------------------- master ----------------------------*/
     if (myRank == 0) {
@@ -71,14 +72,14 @@ int main(int argc, char *argv[]){
         /* send matrix data to the worker threads */
         for(int dest=1; dest<numThreads; dest++){
             if(dest != numThreads-1){
-                MPI_Isend(&rowsPerThread, 1, MPI_INT, dest, 1, MPI_COMM_WORLD, &request1);
-                MPI_Isend(&A[from][0], rowsPerThread*32, MPI_FLOAT, dest, 2, MPI_COMM_WORLD, &request2);
+                MPI_Isend(&rowsPerThread, 1, MPI_INT, dest, 1, MPI_COMM_WORLD, &request);
+                MPI_Isend(&A[from][0], rowsPerThread*32, MPI_FLOAT, dest, 2, MPI_COMM_WORLD, &request);
             }
             else{
-                MPI_Isend(&rowsForLastThread, 1, MPI_INT, dest, 1, MPI_COMM_WORLD, &request1);
-                MPI_Isend(&A[from][0], rowsForLastThread*32, MPI_FLOAT, dest, 2, MPI_COMM_WORLD, &request2);
+                MPI_Isend(&rowsForLastThread, 1, MPI_INT, dest, 1, MPI_COMM_WORLD, &request);
+                MPI_Isend(&A[from][0], rowsForLastThread*32, MPI_FLOAT, dest, 2, MPI_COMM_WORLD, &request);
             }
-            MPI_Isend(&B, 32*N, MPI_FLOAT, dest, 3, MPI_COMM_WORLD, &request3);
+            MPI_Isend(&B, 32*N, MPI_FLOAT, dest, 3, MPI_COMM_WORLD, &request);
             from += rowsPerThread;
         }
 
@@ -99,11 +100,11 @@ int main(int argc, char *argv[]){
             MPI_Recv(&C[from][0], rowsPerThread*N, MPI_FLOAT, i, 5, MPI_COMM_WORLD, &status);
             from += rowsPerThread;
         }
+        MPI_Wait(&request, &status);
 
-
-        auto end = chrono::steady_clock::now();
-        auto diff = end - start;
-        cout << "Parallel Program Runtime: " << chrono::duration <double, milli> (diff).count() << " ms" << endl;
+        auto end_parallel = chrono::steady_clock::now();
+        auto diff_parallel = end_parallel - start_parallel;
+        cout << "Parallel Program Runtime: " << chrono::duration <double, milli> (diff_parallel).count() << " ms" << endl;
         
         /* Print matrix A */
         // cout << "A:" << endl; 
@@ -130,6 +131,8 @@ int main(int argc, char *argv[]){
         //     cout << endl;
         // }
         
+        auto start_serial = chrono::steady_clock::now();
+
         for (int i = 0; i < N; i++){
             for (int j = 0; j < N; j++){
                 C_Serial[i][j] = 0.f;
@@ -138,6 +141,10 @@ int main(int argc, char *argv[]){
                 }
             }
         }
+
+        auto end_serial = chrono::steady_clock::now();
+        auto diff_serial = end_serial - start_serial;
+        cout << "Serial Program Runtime: " << chrono::duration <double, milli> (diff_serial).count() << " ms" << endl;
 
         /* Print matrix C_Serial */
         // cout << endl << "C_Serial:" << endl;
@@ -164,13 +171,10 @@ int main(int argc, char *argv[]){
     
     /*---------------------------- worker----------------------------*/
     if (myRank > 0) {
-        MPI_Recv(&rowsPerThread, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status, &request1);
-        MPI_Wait(&request1, &status);
-        MPI_Irecv(&A, rowsPerThread*32, MPI_FLOAT, 0, 2, MPI_COMM_WORLD, &status, &request2);
-        MPI_Wait(&request2, &status);
-        MPI_Irecv(&B, 32*N, MPI_FLOAT, 0, 3, MPI_COMM_WORLD, &status, &request3);
-        MPI_Wait(&request3, &status);
-        
+        MPI_Irecv(&rowsPerThread, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &request);
+        MPI_Irecv(&A, rowsPerThread*32, MPI_FLOAT, 0, 2, MPI_COMM_WORLD, &request);
+        MPI_Irecv(&B, 32*N, MPI_FLOAT, 0, 3, MPI_COMM_WORLD, &request);
+        MPI_Wait(&request, &status);
 
         /* Matrix multiplication for worker threads */
         for (int i=0; i<rowsPerThread; i++){
@@ -182,8 +186,8 @@ int main(int argc, char *argv[]){
             }
         }
 
-        MPI_Send(&rowsPerThread, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
-        MPI_Send(&C, rowsPerThread*N, MPI_FLOAT, 0, 2, MPI_COMM_WORLD);
+        MPI_Isend(&rowsPerThread, 1, MPI_INT, 0, 4, MPI_COMM_WORLD, &request);
+        MPI_Isend(&C, rowsPerThread*N, MPI_FLOAT, 0, 5, MPI_COMM_WORLD, &request);
     
         // cout << rowsPerThread << " " << endl;
     }
