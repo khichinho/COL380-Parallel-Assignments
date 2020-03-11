@@ -5,10 +5,9 @@
 
 using namespace std;
 
-#define N 5000
-
+#define N 10000
 float A[N][32], B[32][N], C[N][N];
-
+float C_serial[N][N];
 void initializeMatrices(){
 
     for(int i = 0 ; i < N ; i +=1){
@@ -84,7 +83,7 @@ int main(int argc, char *argv[]){
 
 
     if(myRank == 0){
-        float C_serial[N][N];
+        
         
         auto start_serial = chrono::steady_clock::now();
         
