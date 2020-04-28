@@ -3,9 +3,6 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
-
-// #include "mapreduce.hpp"
 
 using namespace std;
 

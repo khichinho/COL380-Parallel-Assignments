@@ -1,4 +1,4 @@
-# Assignment2 Part 2: Due on Apr 16
+# Assignment2 Part 2: Due on May 5
 
 In this assignment, you will learn on your own two new concepts, both coming from [**Google: the pagerank algorithm**](http://www.ams.org/publicoutreach/feature-column/fcarc-pagerank) and [**mapreduce**](https://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf) paradigm for problem solving.
 
