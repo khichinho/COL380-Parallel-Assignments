@@ -159,7 +159,7 @@ void pagerank_mapreduce(){
     while(change > convergence){
         // if(iteration == 2){ break; }
 
-        cout << "Iteration " << iteration << " =>" << endl;
+        cout << "Iteration " << iteration << ": ";
         new_pr = step_mapreduce(pr);
 
         change = 0;
@@ -181,11 +181,16 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<web_size; i++){ pr[i] = ((double)1)/web_size; }
 
     pagerank_mapreduce();
+    cout << endl << "Saving Pageranks to Output file." << endl;
     
-    cout << endl << "Page Ranks for our web are:" << endl;
+    ofstream myfile;
+    myfile.open(filename.substr(0, filename.length()-4) + "-pr-cpp.txt");
+    
     for(int i=0; i<web_size; i++){
-        cout << i << " : " << pr[i] << endl;
+        myfile << i << " : " << pr[i] << endl;
     }
 
+    myfile.close();
+    
     return(0);
 }
